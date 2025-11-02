@@ -65,30 +65,31 @@ export default function CrazyLoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 overflow-hidden" style={{ background: gradients.background }}>
-      {/* floating background blobs - subtle professional effect */}
-      <motion.div
-        className="pointer-events-none absolute inset-0"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-      >
+    <div className="min-h-screen pt-20 md:pt-24" style={{ background: gradients.background }}>
+      <div className="relative overflow-hidden min-h-screen flex items-center justify-center p-4 sm:p-6">
+        {/* floating background blobs - subtle professional effect */}
         <motion.div
-          className="absolute w-72 h-72 rounded-full blur-3xl mix-blend-multiply opacity-30"
-          style={{ background: radialGradients.navy }}
-          animate={{ x: [-20, 20, -20], y: [-10, 10, -10] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        />
-        <motion.div
-          className="absolute w-96 h-96 rounded-full blur-3xl mix-blend-multiply opacity-20"
-          style={{ background: radialGradients.sky }}
-          animate={{ x: [30, -30, 30], y: [15, -15, 15] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        />
-      </motion.div>
+          className="pointer-events-none absolute inset-0"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
+          <motion.div
+            className="absolute w-72 h-72 rounded-full blur-3xl mix-blend-multiply opacity-30"
+            style={{ background: radialGradients.navy }}
+            animate={{ x: [-20, 20, -20], y: [-10, 10, -10] }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute w-96 h-96 rounded-full blur-3xl mix-blend-multiply opacity-20"
+            style={{ background: radialGradients.sky }}
+            animate={{ x: [30, -30, 30], y: [15, -15, 15] }}
+            transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </motion.div>
 
-      <div className="relative w-full max-w-6xl grid grid-cols-12 gap-6 z-10">
+        <div className="relative w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6 z-10">
         {/* Left - Visual playground */}
-        <div className="col-span-7 backdrop-blur-md rounded-3xl p-8 overflow-hidden relative border bg-white/80" style={{ borderColor: border.light }}>
+        <div className="hidden lg:block lg:col-span-7 backdrop-blur-md rounded-3xl p-8 overflow-hidden relative border bg-white/80" style={{ borderColor: border.light }}>
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-4xl font-extrabold tracking-tight" style={{ color: text.primary }}>Scholar Bharat</h1>
@@ -209,11 +210,35 @@ export default function CrazyLoginPage() {
         </div>
 
         {/* Right - Auth form area */}
-        <div className="col-span-5 rounded-3xl p-8 border flex flex-col justify-center relative overflow-hidden bg-white/90 backdrop-blur-sm" style={{ borderColor: border.light }}>
+        <div className="col-span-1 lg:col-span-5 rounded-3xl p-6 sm:p-8 border flex flex-col justify-center relative overflow-hidden bg-white/90 backdrop-blur-sm" style={{ borderColor: border.light }}>
 
           <div className="absolute -top-12 -right-12 w-56 h-56 rounded-full blur-2xl opacity-40" style={{ background: gradients.navySky }} />
 
-          <h3 className="text-2xl font-bold mb-4" style={{ color: text.primary }}>{mode === 'login' ? 'Welcome Back' : 'Create with Scholar Bharat'}</h3>
+          {/* Mobile header with logo and toggle */}
+          <div className="lg:hidden mb-6 text-center">
+            <motion.div
+              className="inline-flex w-16 h-16 rounded-xl items-center justify-center text-lg font-bold text-white mb-3"
+              whileHover={{ scale: 1.05 }}
+              style={{ background: gradients.navySky }}
+            >
+              SB
+            </motion.div>
+            <h1 className="text-2xl font-extrabold tracking-tight mb-1" style={{ color: text.primary }}>Scholar Bharat</h1>
+            <p className="text-xs mb-4" style={{ color: text.muted }}>Where interviews become unforgettable</p>
+            <button
+              onClick={() => setMode(mode === "login" ? "signup" : "login")}
+              className="px-4 py-2 rounded-full text-sm font-medium transition-colors"
+              style={{ 
+                backgroundColor: dark['8'], 
+                color: text.primary,
+                border: `1px solid ${border.default}`
+              }}
+            >
+              {mode === "login" ? "Switch to Signup" : "Switch to Login"}
+            </button>
+          </div>
+
+          <h3 className="text-xl sm:text-2xl font-bold mb-4" style={{ color: text.primary }}>{mode === 'login' ? 'Welcome Back' : 'Create with Scholar Bharat'}</h3>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === 'signup' && (
@@ -288,13 +313,13 @@ export default function CrazyLoginPage() {
               />
             </label>
 
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center gap-2">
                 <input id="remember" type="checkbox" className="w-4 h-4 rounded border-gray-300" />
-                <label htmlFor="remember" className="text-sm" style={{ color: text.muted }}>Remember me</label>
+                <label htmlFor="remember" className="text-xs sm:text-sm" style={{ color: text.muted }}>Remember me</label>
               </div>
 
-              <a className="text-sm underline" style={{ color: brand.sky }} href="#">Forgot?</a>
+              <a className="text-xs sm:text-sm underline" style={{ color: brand.sky }} href="#">Forgot?</a>
             </div>
 
             {error && (
@@ -319,7 +344,7 @@ export default function CrazyLoginPage() {
 
             <div className="text-center text-xs" style={{ color: text.muted }}>Or continue with</div>
 
-            <div className="flex gap-3 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
               {[
                 { name: 'Google', Icon: Chrome },
                 { name: 'GitHub', Icon: Github },
@@ -327,7 +352,7 @@ export default function CrazyLoginPage() {
               ].map(({ name, Icon }) => (
                 <motion.button
                   key={name}
-                  className="px-3 py-2 rounded-lg text-sm border flex items-center gap-2"
+                  className="px-3 py-3 sm:py-2 rounded-lg text-sm border flex items-center justify-center gap-2 w-full sm:w-auto"
                   style={{ 
                     backgroundColor: background.white, 
                     color: text.primary,
@@ -355,14 +380,14 @@ export default function CrazyLoginPage() {
               <motion.div
                 animate={{ y: [0, -4, 0, -3, 0] }}
                 transition={{ repeat: Infinity, duration: filledCount ? 3 : 6, ease: 'easeInOut' }}
-                className="w-14 h-14 rounded-full flex items-center justify-center font-bold text-white"
+                className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center font-bold text-white text-sm sm:text-base"
                 style={{ background: gradients.navySky }}
               >
                 AI
               </motion.div>
 
-              <div>
-                <div className="text-sm font-medium" style={{ color: text.primary }}>Assistant</div>
+              <div className="flex-1">
+                <div className="text-xs sm:text-sm font-medium" style={{ color: text.primary }}>Assistant</div>
                 <div className="text-xs" style={{ color: text.muted }}>{mode === 'login' ? (filledCount >= totalCount ? 'Ready to proceed' : 'Fill email & password') : (filledCount >= totalCount ? 'Welcome aboard!' : 'Fill all fields to continue')}</div>
               </div>
             </motion.div>
@@ -393,6 +418,7 @@ export default function CrazyLoginPage() {
             )}
           </AnimatePresence>
 
+        </div>
         </div>
       </div>
 

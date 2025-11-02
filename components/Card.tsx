@@ -44,8 +44,9 @@ export default function Card({
   };
 
   const hoverStyle = hover && !reducedMotion ? {
-    scale: 1.02,
-    boxShadow: `0 8px 24px ${shadows.subtle}`
+    scale: 1.03,
+    y: -4,
+    boxShadow: `0 12px 32px ${shadows.subtle}`
   } : {};
 
   return (
@@ -53,6 +54,8 @@ export default function Card({
       className={`${baseStyles} ${className}`}
       style={cardStyle}
       whileHover={hoverStyle}
+      whileTap={onClick && !reducedMotion ? { scale: 0.98 } : undefined}
+      transition={{ duration: 0.15 }}
       onClick={onClick}
     >
       {children}

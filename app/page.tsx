@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ArrowRight, 
   Sparkles, 
@@ -18,7 +18,9 @@ import {
   Award,
   ChevronLeft,
   ChevronRight,
-  Star
+  Star,
+  X,
+  ChevronUp
 } from 'lucide-react';
 import { useDrawer } from '@/context/DrawerContext';
 import Button from '@/components/Button';
@@ -50,6 +52,48 @@ export default function HomePage() {
   const { openDrawer } = useDrawer();
   const [testimonialIndex, setTestimonialIndex] = useState(0);
   const [activeTab, setActiveTab] = useState<'recruiters' | 'candidates'>('recruiters');
+  const [showDrawerHint, setShowDrawerHint] = useState(false);
+
+  // Check if user has seen the drawer hint before
+  useEffect(() => {
+    const hasSeenHint = localStorage.getItem('hasSeenDrawerHint');
+    if (!hasSeenHint) {
+      // Show hint after a short delay
+      const timer = setTimeout(() => {
+        setShowDrawerHint(true);
+      }, 1500);
+
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
+  // Auto-dismiss hint after 10 seconds
+  useEffect(() => {
+    if (showDrawerHint) {
+      const timer = setTimeout(() => {
+        dismissHint();
+      }, 10000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showDrawerHint]);
+
+  // Dismiss hint on scroll
+  useEffect(() => {
+    if (showDrawerHint) {
+      const handleScroll = () => {
+        dismissHint();
+      };
+
+      window.addEventListener('scroll', handleScroll);
+      return () => window.removeEventListener('scroll', handleScroll);
+    }
+  }, [showDrawerHint]);
+
+  const dismissHint = () => {
+    setShowDrawerHint(false);
+    localStorage.setItem('hasSeenDrawerHint', 'true');
+  };
 
   const handleScroll = (id: string) => {
     const element = document.getElementById(id);
@@ -60,6 +104,60 @@ export default function HomePage() {
 
   return (
     <div style={{ backgroundColor: background.primary }}>
+      {/* Drawer Discovery Hint */}
+      <AnimatePresence>
+        {showDrawerHint && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5, ease: 'easeOut' }}
+            className="fixed top-20 right-4 md:right-8 lg:right-32 xl:right-48 z-40 max-w-xs"
+          >
+            <motion.div
+              animate={{ 
+                boxShadow: [
+                  `0 4px 20px ${accent.emerald}30`,
+                  `0 4px 30px ${accent.emerald}50`,
+                  `0 4px 20px ${accent.emerald}30`
+                ]
+              }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              className="rounded-lg p-4 flex items-start gap-3"
+              style={{
+                backgroundColor: background.white,
+                border: `2px solid ${accent.emerald}`
+              }}
+            >
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-1">
+                  <Briefcase size={18} style={{ color: accent.emerald }} />
+                  <span className="font-semibold text-sm" style={{ color: text.primary }}>
+                    Explore Opportunities
+                  </span>
+                </div>
+                <p className="text-xs" style={{ color: text.muted }}>
+                  Browse Jobs, Courses & Mock Interviews
+                </p>
+                <div className="flex items-center gap-1 mt-2">
+                  <ChevronUp size={16} style={{ color: accent.emerald }} />
+                  <span className="text-xs font-medium" style={{ color: accent.emerald }}>
+                    Click "Browse Jobs" above
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={dismissHint}
+                className="p-1 hover:bg-gray-100 rounded transition-colors"
+                aria-label="Dismiss hint"
+              >
+                <X size={16} style={{ color: text.muted }} />
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Hero Section - Dual Magnetic Layout */}
       <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
@@ -133,7 +231,7 @@ export default function HomePage() {
               </div>
             </motion.div>
 
-            {/* Right: Candidate CTAs */}
+            {/* Right: Candidate & Interviewer CTAs */}
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -152,18 +250,18 @@ export default function HomePage() {
 
                 <div className="relative z-10">
                   <Badge variant="featured" size="md">
-                    For Job Seekers
+                    For Candidates & Experts
                   </Badge>
                   
                   <h2 
                     className="text-2xl md:text-3xl font-bold mt-4 mb-3"
                     style={{ color: text.primary }}
                   >
-                    Find Your Dream Job
+                    We don&apos;t just tell you where to apply
                   </h2>
                   
                   <p className="text-base mb-6" style={{ color: text.muted }}>
-                    We don&apos;t just tell you where to apply — we help you get hired.
+                    We put our best efforts to get you hired.
                   </p>
 
                   <div className="space-y-3">
@@ -171,6 +269,21 @@ export default function HomePage() {
                       <Button variant="primary" fullWidth size="lg">
                         <Sparkles size={20} className="mr-2" />
                         Explore Opportunities
+                      </Button>
+                    </Link>
+                    
+                    <Link href="/join-interviewer" className="block">
+                      <Button 
+                        variant="primary" 
+                        fullWidth 
+                        size="lg"
+                        style={{ 
+                          background: gradients.navySky,
+                          border: 'none'
+                        }}
+                      >
+                        <Users size={20} className="mr-2" />
+                        Join as Interviewer
                       </Button>
                     </Link>
                     
@@ -195,6 +308,10 @@ export default function HomePage() {
                       <CheckCircle2 size={16} style={{ color: brand.sky }} />
                       <span>Expert-led courses</span>
                     </div>
+                    <div className="flex items-center gap-2 text-sm mt-2" style={{ color: text.muted }}>
+                      <CheckCircle2 size={16} style={{ color: accent.emerald }} />
+                      <span>Earn ₹2K-5K per interview as an expert</span>
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -208,7 +325,7 @@ export default function HomePage() {
         <section className="py-8 px-4 sm:px-6 lg:px-8 sticky top-20 z-20" style={{ backgroundColor: background.white, borderBottom: `1px solid ${border.light}`, boxShadow: `0 2px 4px ${shadows.subtle}` }}>
           <div className="max-w-4xl mx-auto">
             <div className="flex items-center justify-center gap-4">
-              <button
+              <motion.button
                 onClick={() => setActiveTab('recruiters')}
                 className="px-6 py-3 rounded-lg font-semibold transition-all"
                 style={{
@@ -216,10 +333,13 @@ export default function HomePage() {
                   color: activeTab === 'recruiters' ? 'white' : text.secondary,
                   border: `2px solid ${activeTab === 'recruiters' ? brand.navy : border.default}`
                 }}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.15 }}
               >
                 For Recruiters
-              </button>
-              <button
+              </motion.button>
+              <motion.button
                 onClick={() => setActiveTab('candidates')}
                 className="px-6 py-3 rounded-lg font-semibold transition-all"
                 style={{
@@ -227,9 +347,12 @@ export default function HomePage() {
                   color: activeTab === 'candidates' ? 'white' : text.secondary,
                   border: `2px solid ${activeTab === 'candidates' ? accent.emerald : border.default}`
                 }}
+                whileHover={{ scale: 1.05, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.15 }}
               >
                 For Candidates
-              </button>
+              </motion.button>
             </div>
           </div>
         </section>
@@ -709,17 +832,20 @@ export default function HomePage() {
                 </p>
 
                 <div className="flex items-center justify-between">
-                  <button
+                  <motion.button
                     onClick={() => setTestimonialIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length)}
                     className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                     aria-label="Previous testimonial"
+                    whileHover={{ scale: 1.1, x: -2 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={{ duration: 0.15 }}
                   >
                     <ChevronLeft size={24} />
-                  </button>
+                  </motion.button>
 
                   <div className="flex gap-2">
                     {testimonials.map((_, i) => (
-                      <button
+                      <motion.button
                         key={i}
                         onClick={() => setTestimonialIndex(i)}
                         className="w-2 h-2 rounded-full transition-colors"
@@ -727,17 +853,23 @@ export default function HomePage() {
                           backgroundColor: i === testimonialIndex ? brand.navy : border.default 
                         }}
                         aria-label={`Go to testimonial ${i + 1}`}
+                        whileHover={{ scale: 1.5 }}
+                        whileTap={{ scale: 0.8 }}
+                        transition={{ duration: 0.15 }}
                       />
                     ))}
                   </div>
 
-                  <button
+                  <motion.button
                     onClick={() => setTestimonialIndex((prev) => (prev + 1) % testimonials.length)}
                     className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                     aria-label="Next testimonial"
+                    whileHover={{ scale: 1.1, x: 2 }}
+                    whileTap={{ scale: 0.9 }}
+                    transition={{ duration: 0.15 }}
                   >
                     <ChevronRight size={24} />
-                  </button>
+                  </motion.button>
                 </div>
               </Card>
             </div>

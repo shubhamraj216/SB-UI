@@ -91,10 +91,12 @@ export default function Button({
       className={`${baseStyles} ${sizeStyles[size]} ${className}`}
       style={buttonStyle}
       whileHover={!disabled && !reducedMotion ? { 
-        scale: style.hoverScale,
-        boxShadow: style.boxShadow
+        scale: variant === 'ghost' || variant === 'outline' ? 1.02 : 1.05,
+        boxShadow: style.boxShadow,
+        y: -2
       } : undefined}
-      whileTap={!disabled && !reducedMotion ? { scale: 0.98 } : undefined}
+      whileTap={!disabled && !reducedMotion ? { scale: 0.95, y: 0 } : undefined}
+      transition={{ duration: 0.15 }}
       disabled={disabled || loading}
       onClick={onClick}
     >

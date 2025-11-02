@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Menu, X, User, LogOut, Briefcase, Calendar, Settings } from 'lucide-react';
+import { Menu, X, User, LogOut, Briefcase, Calendar, Settings, ChevronDown, GraduationCap, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Button from './Button';
 import { useDrawer } from '@/context/DrawerContext';
@@ -16,6 +16,7 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isOpportunitiesOpen, setIsOpportunitiesOpen] = useState(false);
   const { openDrawer } = useDrawer();
   const userMenuRef = useRef<HTMLDivElement>(null);
 
@@ -23,6 +24,9 @@ export default function Header() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
     };
+
+    // Set initial state
+    setIsScrolled(window.scrollY > 10);
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
@@ -95,15 +99,21 @@ export default function Header() {
     setIsMobileMenuOpen(false);
   };
 
+  const handleDrawerOpen = (tab: 'jobs' | 'courses' | 'mock-interview') => {
+    openDrawer(tab);
+    setIsMobileMenuOpen(false);
+    setIsOpportunitiesOpen(false);
+  };
+
   const handleLinkClick = () => {
     setIsMobileMenuOpen(false);
   };
 
   return (
     <header
-      className="fixed top-0 left-0 right-0 z-30 transition-all duration-300"
+      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 backdrop-blur-md"
       style={{
-        backgroundColor: isScrolled ? background.white : 'transparent',
+        backgroundColor: isScrolled ? background.white : 'rgba(255, 255, 255, 0.8)',
         borderBottom: isScrolled ? `1px solid ${border.light}` : 'none',
         boxShadow: isScrolled ? `0 2px 8px ${shadows.subtle}` : 'none'
       }}
@@ -111,7 +121,7 @@ export default function Header() {
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 z-50">
+          <Link href="/" className="flex items-center gap-2">
             <div className="text-xl md:text-2xl font-bold" style={{ color: brand.navy }}>
               Scholar Bharat
             </div>
@@ -119,22 +129,28 @@ export default function Header() {
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="text-sm font-medium transition-colors hover:opacity-80"
-                style={{ color: text.secondary }}
-                onClick={handleLinkClick}
+              {navLinks.map((link) => (
+              <motion.div 
+                key={link.label} 
+                whileHover={{ y: -1 }} 
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.15 }}
               >
-                {link.label}
-              </Link>
+                <Link
+                  href={link.href}
+                  className="text-sm font-medium transition-colors hover:opacity-80"
+                  style={{ color: text.secondary }}
+                  onClick={handleLinkClick}
+                >
+                  {link.label}
+                </Link>
+              </motion.div>
             ))}
           </div>
 
           {/* Desktop: Jobs Tab + Auth */}
           <div className="hidden lg:flex items-center gap-3">
-            <button
+            <motion.button
               onClick={handleJobsClick}
               className="px-5 py-2.5 text-sm font-bold rounded-lg transition-all hover:shadow-md"
               style={{
@@ -142,28 +158,37 @@ export default function Header() {
                 color: 'white',
                 boxShadow: `0 2px 8px ${accent.emerald}30`
               }}
+              whileHover={{ scale: 1.05, y: -2, boxShadow: `0 4px 16px ${accent.emerald}50` }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.15 }}
             >
               Browse Jobs
-            </button>
+            </motion.button>
             
             <Link href="/coding-interview">
-              <button
+              <motion.button
                 className="px-5 py-2.5 text-sm font-medium rounded-lg transition-all"
                 style={{
                   color: brand.navy,
                   border: `1px solid ${border.default}`
                 }}
+                whileHover={{ scale: 1.05, y: -2, borderColor: brand.navy }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ duration: 0.15 }}
               >
                 Practice Coding
-              </button>
+              </motion.button>
             </Link>
 
             {isAuthenticated ? (
               <div className="relative" ref={userMenuRef}>
-                <button
+                <motion.button
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all hover:bg-gray-50"
                   style={{ border: `1px solid ${border.default}` }}
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{ duration: 0.15 }}
                 >
                   <div 
                     className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
@@ -174,7 +199,7 @@ export default function Header() {
                   <span className="text-sm font-medium" style={{ color: text.primary }}>
                     {user?.name}
                   </span>
-                </button>
+                </motion.button>
 
                 <AnimatePresence>
                   {isUserMenuOpen && (
@@ -199,7 +224,7 @@ export default function Header() {
                       <div className="py-1">
                         <Link
                           href="/profile"
-                          className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
+                          className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-all hover:translate-x-1"
                           onClick={() => setIsUserMenuOpen(false)}
                         >
                           <User size={16} style={{ color: text.muted }} />
@@ -209,7 +234,7 @@ export default function Header() {
                         {user?.type === 'candidate' && (
                           <Link
                             href="/profile#applications"
-                            className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
+                            className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-all hover:translate-x-1"
                             onClick={() => setIsUserMenuOpen(false)}
                           >
                             <Briefcase size={16} style={{ color: text.muted }} />
@@ -220,7 +245,7 @@ export default function Header() {
                         {user?.type === 'recruiter' && (
                           <Link
                             href="/profile#jobs"
-                            className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
+                            className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-all hover:translate-x-1"
                             onClick={() => setIsUserMenuOpen(false)}
                           >
                             <Briefcase size={16} style={{ color: text.muted }} />
@@ -230,7 +255,7 @@ export default function Header() {
                         
                         <Link
                           href="/profile#interviews"
-                          className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors"
+                          className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-all hover:translate-x-1"
                           onClick={() => setIsUserMenuOpen(false)}
                         >
                           <Calendar size={16} style={{ color: text.muted }} />
@@ -241,7 +266,7 @@ export default function Header() {
                       <div className="py-1 border-t" style={{ borderColor: border.light }}>
                         <button
                           onClick={handleLogout}
-                          className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors w-full text-left"
+                          className="flex items-center gap-3 px-4 py-2 hover:bg-red-50 transition-all hover:translate-x-1 w-full text-left"
                         >
                           <LogOut size={16} style={{ color: text.muted }} />
                           <span className="text-sm" style={{ color: text.secondary }}>Logout</span>
@@ -255,12 +280,7 @@ export default function Header() {
               <>
                 <Link href="/login">
                   <Button variant="outline" size="sm">
-                    Login
-                  </Button>
-                </Link>
-                <Link href="/login">
-                  <Button variant="primary" size="sm">
-                    Sign Up
+                    Login / Sign Up
                   </Button>
                 </Link>
               </>
@@ -269,25 +289,31 @@ export default function Header() {
 
           {/* Mobile: Jobs + Auth buttons */}
           <div className="flex lg:hidden items-center gap-2">
-            <button
+            <motion.button
               onClick={handleJobsClick}
               className="px-3 py-2 text-xs font-bold rounded-lg"
               style={{
                 backgroundColor: accent.emerald,
                 color: 'white'
               }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              transition={{ duration: 0.15 }}
             >
               Jobs
-            </button>
+            </motion.button>
             
             {isAuthenticated ? (
-              <button
+              <motion.button
                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                 className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold"
                 style={{ backgroundColor: brand.navy }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                transition={{ duration: 0.15 }}
               >
                 {getUserInitials()}
-              </button>
+              </motion.button>
             ) : (
               <Link href="/login">
                 <Button variant="primary" size="sm">
@@ -327,7 +353,7 @@ export default function Header() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className="block py-2 text-base font-medium"
+                  className="block py-2 text-base font-medium transition-all hover:translate-x-2"
                   style={{ color: text.secondary }}
                   onClick={handleLinkClick}
                 >
@@ -335,12 +361,68 @@ export default function Header() {
                 </Link>
               ))}
               
+              {/* Browse Opportunities - Nested Menu */}
+              <div className="border-t pt-4 mt-4" style={{ borderColor: border.light }}>
+                <button
+                  onClick={() => setIsOpportunitiesOpen(!isOpportunitiesOpen)}
+                  className="flex items-center justify-between w-full py-2 text-base font-medium transition-all"
+                  style={{ color: text.secondary }}
+                >
+                  <span>Browse Opportunities</span>
+                  <motion.div
+                    animate={{ rotate: isOpportunitiesOpen ? 180 : 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <ChevronDown size={20} />
+                  </motion.div>
+                </button>
+                
+                <AnimatePresence>
+                  {isOpportunitiesOpen && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pl-4 pt-2 space-y-2">
+                        <button
+                          onClick={() => handleDrawerOpen('jobs')}
+                          className="flex items-center gap-3 py-2 w-full text-left transition-all hover:translate-x-2"
+                          style={{ color: text.muted }}
+                        >
+                          <Briefcase size={18} style={{ color: accent.emerald }} />
+                          <span className="text-sm">Jobs</span>
+                        </button>
+                        <button
+                          onClick={() => handleDrawerOpen('courses')}
+                          className="flex items-center gap-3 py-2 w-full text-left transition-all hover:translate-x-2"
+                          style={{ color: text.muted }}
+                        >
+                          <GraduationCap size={18} style={{ color: brand.navy }} />
+                          <span className="text-sm">Courses</span>
+                        </button>
+                        <button
+                          onClick={() => handleDrawerOpen('mock-interview')}
+                          className="flex items-center gap-3 py-2 w-full text-left transition-all hover:translate-x-2"
+                          style={{ color: text.muted }}
+                        >
+                          <MessageSquare size={18} style={{ color: brand.sky }} />
+                          <span className="text-sm">Mock Interview</span>
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+              
               {isAuthenticated && (
                 <>
                   <div className="border-t pt-4 mt-4" style={{ borderColor: border.light }}>
                     <Link
                       href="/profile"
-                      className="flex items-center gap-3 py-2"
+                      className="flex items-center gap-3 py-2 transition-all hover:translate-x-2"
                       style={{ color: text.secondary }}
                       onClick={handleLinkClick}
                     >
@@ -349,7 +431,7 @@ export default function Header() {
                     </Link>
                     <Link
                       href="/profile#interviews"
-                      className="flex items-center gap-3 py-2"
+                      className="flex items-center gap-3 py-2 transition-all hover:translate-x-2"
                       style={{ color: text.secondary }}
                       onClick={handleLinkClick}
                     >
@@ -361,7 +443,7 @@ export default function Header() {
                         handleLogout();
                         setIsMobileMenuOpen(false);
                       }}
-                      className="flex items-center gap-3 py-2 w-full text-left"
+                      className="flex items-center gap-3 py-2 w-full text-left transition-all hover:translate-x-2"
                       style={{ color: text.secondary }}
                     >
                       <LogOut size={18} />
