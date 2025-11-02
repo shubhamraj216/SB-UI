@@ -2,30 +2,36 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Search, Briefcase, GraduationCap, MessageSquare, MapPin, Filter } from 'lucide-react';
+import { X, Briefcase, GraduationCap, MessageSquare } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useDrawer } from '@/context/DrawerContext';
 import { useAuth } from '@/context/AuthContext';
 import Tabs from './Tabs';
 import Button from './Button';
-import Input from './Input';
 import JobCard from './JobCard';
 import Card from './Card';
 import Badge from './Badge';
+import QuickApplyModal from './QuickApplyModal';
 import { background, dark, text, brand, border } from '@/lib/colors';
-import { jobs, courses, mockInterviewRoles } from '@/lib/mockData';
+import { jobs, courses, mockInterviewRoles, Job } from '@/lib/mockData';
 import { prefersReducedMotion } from '@/lib/utils';
 
 export default function CandidateDrawer() {
   const { isOpen, closeDrawer, activeTab, setActiveTab } = useDrawer();
   const { isAuthenticated } = useAuth();
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const reducedMotion = typeof window !== 'undefined' && prefersReducedMotion();
 
   const featuredJobs = jobs.filter(job => job.featured && job.status === 'live').slice(0, 6);
   const featuredCourses = courses.slice(0, 3);
+
+  const handleApply = (job: Job) => {
+    setSelectedJob(job);
+    setIsApplyModalOpen(true);
+  };
 
   const tabs = [
     {
@@ -34,23 +40,6 @@ export default function CandidateDrawer() {
       icon: <Briefcase size={18} />,
       content: (
         <div className="space-y-6">
-          {/* Search & Filters */}
-          <div className="space-y-3">
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <Input
-                  placeholder="Search jobs by title, company, or skills..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  fullWidth
-                />
-              </div>
-              <Button variant="outline" size="md">
-                <Filter size={18} />
-              </Button>
-            </div>
-          </div>
-
           {/* Featured Jobs */}
           <div>
             <h3 className="text-lg font-semibold mb-4" style={{ color: text.primary }}>
@@ -58,7 +47,7 @@ export default function CandidateDrawer() {
             </h3>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {featuredJobs.map((job) => (
-                <JobCard key={job.id} job={job} />
+                <JobCard key={job.id} job={job} onApply={handleApply} />
               ))}
             </div>
           </div>
@@ -307,6 +296,18 @@ export default function CandidateDrawer() {
             </div>
           </motion.div>
         </>
+      )}
+      
+      {/* Quick Apply Modal */}
+      {selectedJob && (
+        <QuickApplyModal
+          isOpen={isApplyModalOpen}
+          onClose={() => {
+            setIsApplyModalOpen(false);
+            setSelectedJob(null);
+          }}
+          job={selectedJob}
+        />
       )}
     </AnimatePresence>
   );

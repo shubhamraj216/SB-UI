@@ -162,7 +162,7 @@ export default function Header() {
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.15 }}
             >
-              Browse Jobs
+              Browse Opportunities
             </motion.button>
             
             <Link href="/coding-interview">
@@ -300,7 +300,7 @@ export default function Header() {
               whileTap={{ scale: 0.95 }}
               transition={{ duration: 0.15 }}
             >
-              Jobs
+              Opportunities
             </motion.button>
             
             {isAuthenticated ? (
